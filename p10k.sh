@@ -47,12 +47,16 @@ sed -i 's/^plugins=(.*/plugins=(git zsh-autosuggestions zsh-syntax-highlighting)
 
 # 7. Migrate settings from .bashrc to .zshrc (অটোমেটিক কপি করার লজিক)
 echo -e "\e[1;33m[*] Migrating configurations from .bashrc to .zshrc...\e[0m"
-if [ -f ~/.bashrc ]; then
+MIGRATE_TAG="# --- Imported from .bashrc ---"
+if [ -f ~/.bashrc ] && ! grep -qF "$MIGRATE_TAG" ~/.zshrc 2>/dev/null; then
     echo "" >> ~/.zshrc
-    echo "# --- Imported from .bashrc ---" >> ~/.zshrc
+    echo "$MIGRATE_TAG" >> ~/.zshrc
     # PS1 বা Bash এর নির্দিষ্ট প্রম্পট কমান্ডগুলো বাদ দিয়ে বাকি সব কপি করবে
-    grep -v -E '^(PS1|PROMPT_COMMAND|shopt|bash)' ~/.bashrc >> ~/.zshrc
+    grep -v -E '^(PS1|PROMPT_COMMAND|shopt|complete|bash|banner)' ~/.bashrc >> ~/.zshrc
 fi
+
+# banner autostart .zshrc-te thik ekbar nishchit kora hocche
+grep -qxF 'banner' ~/.zshrc 2>/dev/null || echo 'banner' >> ~/.zshrc
 
 # 8. Setup Nerd Font (Crucial for Powerlevel10k icons in Termux)
 echo -e "\e[1;33m[*] Setting up Nerd Font for Termux (Requires for P10K icons)...\e[0m"
@@ -68,11 +72,13 @@ echo ""
 echo -e "\e[1;32m[+] Super Setup Complete!\e[0m"
 echo -e "\e[1;36m───────────────────────────────────────────\e[0m"
 echo -e "\e[1;33m[*] NEXT STEPS:\e[0m"
-echo -e "1. We are launching your new shell now."
-echo -e "2. The \e[1;32mPowerlevel10k setup wizard\e[0m will start automatically."
+echo -e "1. Close and reopen Termux (or type \e[1;32mzsh\e[0m) to start your new shell."
+echo -e "2. The \e[1;32mPowerlevel10k setup wizard\e[0m will start automatically the first time."
 echo -e "3. Just answer the Yes/No questions (y/n/1/2) to choose your prompt style!"
 echo -e "\e[1;36m───────────────────────────────────────────\e[0m"
-sleep 3
 
-# Launch Zsh automatically
-exec zsh
+# Launch Zsh WITHOUT 'exec': if zsh crashes/exits, we fall back to the current
+# bash session instead of killing the terminal (which caused a black screen).
+if [ -t 0 ]; then
+    zsh || echo -e "\e[1;31m[!] Zsh exited. You are back in bash. Type 'zsh' to retry.\e[0m"
+fi
