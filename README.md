@@ -1,5 +1,7 @@
 # T-BAN (Termux Banner)
 
+![T-BAN Screenshot](https://raw.githubusercontent.com/JubairSenseiDev/t-ban/refs/heads/main/Screenshot_2026_0801_134741.png)
+
 A dynamic, visually stunning startup banner for Termux written in Python. It automatically fetches and displays real-time system and network statistics inside a clean, centered interface using the `rich` library.
 
 ## 🌟 Features
@@ -17,7 +19,7 @@ A dynamic, visually stunning startup banner for Termux written in Python. It aut
 You don't need to clone any repository. Just copy and paste this single command into your Termux to install it instantly:
 
 ```bash
-curl -sL https://raw.githubusercontent.com/JubairSenseiDev/t-ban/main/setup.sh -o setup.sh && bash setup.sh
+curl -sL [https://raw.githubusercontent.com/JubairSenseiDev/t-ban/main/setup.sh](https://raw.githubusercontent.com/JubairSenseiDev/t-ban/main/setup.sh) -o setup.sh && bash setup.sh
 ```
 
 **Note:** The setup script will automatically install it as a system command and set it to run automatically every time you open a new Termux session.
