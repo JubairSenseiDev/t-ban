@@ -77,6 +77,9 @@ nano $HOME/.banner.py
 ### 1. Uninstall T-BAN (The Banner)
 **Method 1: Using Setup Menu (Recommended)**
 Simply run the installation command again and select option **3** (`Uninstall Banner`) from the interactive menu. It will safely remove all files and configs.
+```bash
+bash setup.sh
+```
 
 **Method 2: Manual Uninstallation**
 If you prefer to remove it manually, run this command in your Termux:
