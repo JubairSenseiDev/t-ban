@@ -38,6 +38,11 @@ curl -sL https://raw.githubusercontent.com/JubairSenseiDev/t-ban/main/p10k.sh -o
 
 This will safely install `Zsh`, `Oh-My-Zsh`, `Powerlevel10k`, and essential plugins while ensuring your T-BAN setup remains perfectly intact.
 
+## If you want to change prompt style 
+```bash
+p10k configure
+```
+
 ---
 
 ## 🚀 Usage
