@@ -7,7 +7,7 @@ REPO_URL="https://github.com/JubairSenseiDev/t-ban/raw/refs/heads/main/banner.py
 
 clear
 echo -e "\e[1;36m──────────────────────────────────\e[0m"
-echo -e "\e[1;32m      SENSEI X BANNER - SETUP SCRIPT     \e[0m"
+echo -e "\e[1;32m    SENSEI X BANNER - SETUP SCRIPT     \e[0m"
 echo -e "\e[1;36m──────────────────────────────────\e[0m"
 echo ""
 
