@@ -45,13 +45,13 @@ cp ~/.zshrc ~/.zshrc.backup 2>/dev/null
 sed -i 's/^ZSH_THEME=.*/ZSH_THEME="powerlevel10k\/powerlevel10k"/' ~/.zshrc
 sed -i 's/^plugins=(.*/plugins=(git zsh-autosuggestions zsh-syntax-highlighting)/' ~/.zshrc
 
-# 7. Add existing T-BAN to new Zsh (so the banner still works!)
-if command -v banner &> /dev/null; then
-    if ! grep -q "banner" ~/.zshrc; then
-        echo "" >> ~/.zshrc
-        echo "# Load SENSEI X BANNER" >> ~/.zshrc
-        echo "banner" >> ~/.zshrc
-    fi
+# 7. Migrate settings from .bashrc to .zshrc (অটোমেটিক কপি করার লজিক)
+echo -e "\e[1;33m[*] Migrating configurations from .bashrc to .zshrc...\e[0m"
+if [ -f ~/.bashrc ]; then
+    echo "" >> ~/.zshrc
+    echo "# --- Imported from .bashrc ---" >> ~/.zshrc
+    # PS1 বা Bash এর নির্দিষ্ট প্রম্পট কমান্ডগুলো বাদ দিয়ে বাকি সব কপি করবে
+    grep -v -E '^(PS1|PROMPT_COMMAND|shopt|bash)' ~/.bashrc >> ~/.zshrc
 fi
 
 # 8. Setup Nerd Font (Crucial for Powerlevel10k icons in Termux)
