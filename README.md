@@ -80,10 +80,11 @@ rm -f $PREFIX/bin/banner ~/.sensei_config.json ~/.banner.py && sed -i '/banner/d
 ```
 
 ### 2. Uninstall Pro Terminal (Zsh + P10k)
-If you installed the Powerlevel10k terminal styling and want to revert back to the default Termux shell (Bash), run this single command and then restart Termux:
+If you installed the Powerlevel10k terminal styling and want to revert back to the default Termux shell (Bash), run this single bulletproof command:
 ```bash
-chsh -s bash && rm -rf ~/.oh-my-zsh ~/.zshrc ~/.p10k.zsh ~/.zhistory && [ -f ~/.zshrc.backup ] && mv ~/.zshrc.backup ~/.zshrc; echo -e "\n✅ Zsh & P10k Uninstalled. Please restart Termux!"
+rm -rf ~/.oh-my-zsh ~/.zshrc ~/.zshrc.backup ~/.p10k.zsh ~/.zhistory ~/.zcompdump* ; chsh -s bash ; exec bash
 ```
+
 
 ## 📦 Requirements
 * `python` 3.x
