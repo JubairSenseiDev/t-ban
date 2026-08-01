@@ -1,5 +1,4 @@
 import os
-import sys
 import platform
 import subprocess
 import shutil
@@ -17,40 +16,15 @@ console = Console()
 
 # ================= CONFIG & USERNAME =================
 CONFIG_FILE = os.path.expanduser("~/.sensei_config.json")
+NAME = "SENSEI X"
 
-def get_username():
-    is_reset = "--reset" in sys.argv
+if os.path.exists(CONFIG_FILE):
+    try:
+        with open(CONFIG_FILE, "r") as f:
+            NAME = json.load(f).get("name", "SENSEI X")
+    except Exception:
+        pass
 
-    # যদি ইউজার নাম রিসেট করতে চায়, আগের ফাইল মুছে ফেলবে
-    if is_reset and os.path.exists(CONFIG_FILE):
-        os.remove(CONFIG_FILE)
-
-    # যদি রিসেট না হয় এবং আগে থেকে সেভ করা নাম থাকে, তবে সেটি লোড করবে
-    if not is_reset and os.path.exists(CONFIG_FILE):
-        try:
-            with open(CONFIG_FILE, "r") as f:
-                return json.load(f).get("name", "SENSEI X")
-        except Exception:
-            pass
-
-    # নতুন নাম চাইবে
-    console.clear()
-    console.print("[bold cyan]Welcome to SENSEI X[/]")
-    name = console.input("[bold green]Enter your new name:[/] ").strip() or "SENSEI X"
-
-    # নতুন নাম ফাইলে সেভ করবে
-    with open(CONFIG_FILE, "w") as f:
-        json.dump({"name": name}, f)
-
-    # যদি কমান্ড banner --reset হয়, তবে নাম সেভ করে এখানেই স্ক্রিপ্ট বন্ধ করে দিবে!
-    if is_reset:
-        console.print(f"\n[bold green]✅ Name successfully updated to: {name}[/]")
-        sys.exit(0)
-
-    return name
-
-# ================= INITIALIZATION =================
-NAME = get_username()
 console.clear()
 
 # ================= TERMINAL =================
@@ -86,7 +60,6 @@ def generate_ascii(text):
 result = {}
 
 def backend_collect():
-    # Network + IP
     try:
         r = requests.get("https://ipinfo.io/json", timeout=4)
         result["online"] = True
@@ -95,11 +68,8 @@ def backend_collect():
         result["online"] = False
         result["ipinfo"] = {}
 
-    # System
     try:
-        result["android"] = subprocess.check_output(
-            ["getprop", "ro.build.version.release"], text=True
-        ).strip()
+        result["android"] = subprocess.check_output(["getprop", "ro.build.version.release"], text=True).strip()
     except Exception:
         result["android"] = "N/A"
 
@@ -109,13 +79,10 @@ def backend_collect():
         result["cores"] = "?"
 
     try:
-        result["uptime"] = subprocess.check_output(
-            ["uptime", "-p"], text=True
-        ).strip().replace("up ", "")
+        result["uptime"] = subprocess.check_output(["uptime", "-p"], text=True).strip().replace("up ", "")
     except Exception:
         result["uptime"] = "N/A"
 
-    # HANG FIX: No bash loop, pure python reading
     try:
         prefix = os.environ.get("PREFIX", "/data/data/com.termux/files/usr")
         result["pkgs"] = str(len(os.listdir(f"{prefix}/bin")))
@@ -129,10 +96,7 @@ def backend_collect():
         result["ram"] = "N/A"
 
     try:
-        line = subprocess.check_output(
-            ["df", "-h", os.path.expanduser("~")],
-            text=True
-        ).splitlines()[1].split()
+        line = subprocess.check_output(["df", "-h", os.path.expanduser("~")], text=True).splitlines()[1].split()
         result["disk"] = f"{line[2]} / {line[1]}"
     except Exception:
         result["disk"] = "N/A"
@@ -145,13 +109,12 @@ def loading_screen():
         "[bold cyan]Loading environment…[/]",
         "[bold cyan]Preparing interface…[/]",
     ]
-    with Live(Align.center(frames[0], vertical="middle"),
-              refresh_per_second=6, console=console) as live:
+    with Live(Align.center(frames[0], vertical="middle"), refresh_per_second=6, console=console) as live:
         for i in range(12):
             live.update(Align.center(frames[i % len(frames)], vertical="middle"))
             time.sleep(0.3)
 
-# ================= RUN BACKEND IN PARALLEL =================
+# ================= RUN BACKEND =================
 t = threading.Thread(target=backend_collect)
 t.start()
 loading_screen()
@@ -160,7 +123,6 @@ t.join()
 # ================= FINAL UI =================
 console.clear()
 
-# Logo
 logo = Panel(
     Text(generate_ascii(NAME), style="bold cyan", no_wrap=True),
     title=f"[bold white]{NAME}[/bold white]",
@@ -168,9 +130,7 @@ logo = Panel(
     padding=(0, 2),
 )
 
-# Info
 info = Text()
-
 def add_info(label, value, style="bright_cyan"):
     info.append(f"{label:<12}", style="bold yellow")
     info.append(" : ", style="dim")
@@ -194,12 +154,7 @@ add_info("Packages", result.get("pkgs", "N/A"))
 add_info("RAM", result.get("ram", "N/A"))
 add_info("Disk", result.get("disk", "N/A"))
 
-info_panel = Panel(
-    info,
-    border_style="green",
-    padding=(0, 2),
-)
-
+info_panel = Panel(info, border_style="green", padding=(0, 2))
 console.print(logo)
 console.print()
 console.print(info_panel)
