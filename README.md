@@ -13,13 +13,10 @@ A dynamic, visually stunning startup banner for Termux written in Python. It aut
 
 ## ⚙️ Installation
 
-You can install this simply by running the setup script:
+You don't need to clone any repository. Just copy and paste this single command into your Termux to install it instantly:
 
 ```bash
-git clone [https://github.com/JubairSenseiDev/t-ban.git](https://github.com/JubairSenseiDev/t-ban.git)
-cd t-ban
-chmod +x setup.sh
-./setup.sh
+curl -sL https://raw.githubusercontent.com/JubairSenseiDev/t-ban/main/setup.sh | bash
 ```
 
 **Note:** The setup script will automatically install it as a system command and set it to run automatically every time you open a new Termux session.
@@ -38,7 +35,7 @@ If you want to change the name on the banner or fix a typo, you can run:
 ```bash
 banner --reset
 ```
-Alternatively, you can run `./setup.sh` again to access the interactive update menu.
+Alternatively, you can run the installation command again to access the interactive update menu.
 
 ## 📦 Requirements
 * `python` 3.x
