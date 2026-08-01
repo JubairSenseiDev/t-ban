@@ -62,6 +62,11 @@ If you want to change the name on the banner or fix a typo, you can quickly rese
 banner --reset
 ```
 Alternatively, you can run the installation command again to access the interactive update menu.
+## If you want change Full Banner 
+```bash
+nano $HOME/.banner.py
+```
+
 
 ## FINAL LOOK 
 
