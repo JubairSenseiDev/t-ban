@@ -60,13 +60,15 @@ CONFIG_FILE="$HOME/.sensei_config.json"
 if [ "$1" == "--reset" ]; then
     clear
     echo -e "\e[1;36mWelcome to SENSEI X\e[0m"
-    read -p $'\e[1;32mEnter your new name: \e[0m' NEW_NAME
-    
+    read -r -p $'\e[1;32mEnter your new name: \e[0m' NEW_NAME
+
     # If no name is provided, use default
     NEW_NAME=${NEW_NAME:-SENSEI X}
-    
-    echo "{\"name\": \"$NEW_NAME\"}" > "$CONFIG_FILE"
-    
+
+    # Write JSON via python so quotes/backslashes in the name stay valid JSON.
+    CONFIG_FILE="$CONFIG_FILE" NAME_VALUE="$NEW_NAME" python3 -c 'import json,os;open(os.environ["CONFIG_FILE"],"w").write(json.dumps({"name":os.environ["NAME_VALUE"]}))' || \
+        printf '{"name": "SENSEI X"}' > "$CONFIG_FILE"
+
     echo -e "\n\e[1;32m√ Name successfully updated to: $NEW_NAME\e[0m"
     exit 0
 fi
