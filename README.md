@@ -37,6 +37,12 @@ banner --reset
 ```
 Alternatively, you can run the installation command again to access the interactive update menu.
 
+## How to uninstall full script 
+```bash
+rm -f $PREFIX/bin/banner ~/.sensei_config.json && sed -i '/banner/d' ~/.bashrc ~/.zshrc 2>/dev/null
+```
+Now auto remove the banner
+
 ## 📦 Requirements
 * `python` 3.x
 * `figlet` 
