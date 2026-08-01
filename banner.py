@@ -125,7 +125,7 @@ console.clear()
 
 logo = Panel(
     Text(generate_ascii(NAME), style="bold cyan", no_wrap=True),
-    title=f"[bold white]{NAME}[/bold white]",
+    title=Text(NAME, style="bold white"),
     border_style="cyan",
     padding=(0, 2),
 )

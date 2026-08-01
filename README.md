@@ -84,7 +84,7 @@ bash setup.sh
 **Method 2: Manual Uninstallation**
 If you prefer to remove it manually, run this command in your Termux:
 ```bash
-rm -f $PREFIX/bin/banner ~/.sensei_config.json ~/.banner.py && sed -i '/banner/d' ~/.bashrc ~/.zshrc 2>/dev/null
+rm -f $PREFIX/bin/banner ~/.sensei_config.json ~/.banner.py && sed -i '/^banner$/d' ~/.bashrc ~/.zshrc 2>/dev/null
 ```
 
 ### 2. Uninstall Pro Terminal (Zsh + P10k)

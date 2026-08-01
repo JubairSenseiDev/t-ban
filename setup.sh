@@ -19,7 +19,9 @@ update_name() {
 uninstall_banner() {
     echo -e "\e[1;31m[*] Uninstalling SENSEI X BANNER...\e[0m"
     rm -f "$BIN_DIR/$CMD_NAME" "$HOME/.sensei_config.json" "$BANNER_FILE"
-    sed -i '/banner/d' ~/.bashrc ~/.zshrc 2>/dev/null
+    for rc in "$HOME/.bashrc" "$HOME/.zshrc"; do
+        [ -f "$rc" ] && sed -i '/^banner$/d' "$rc"
+    done
     echo -e "\e[1;32m[+] Uninstallation Complete! Banner is removed.\e[0m"
     exit 0
 }
@@ -37,8 +39,8 @@ install_banner() {
     # Creating a global command 'banner' in $PREFIX/bin with purely BASH logic
     echo -e "\e[1;33m[*] Creating global command '$CMD_NAME'...\e[0m"
     
-    cat << 'EOF' > "$BIN_DIR/$CMD_NAME"
-#!/bin/bash
+    echo "#!$PREFIX/bin/bash" > "$BIN_DIR/$CMD_NAME"
+    cat << 'EOF' >> "$BIN_DIR/$CMD_NAME"
 
 CONFIG_FILE="$HOME/.sensei_config.json"
 
