@@ -3,6 +3,7 @@
 A dynamic, visually stunning startup banner for Termux written in Python. It automatically fetches and displays real-time system and network statistics inside a clean, centered interface using the `rich` library.
 
 ## 🌟 Features
+* **Global Command:** Install it once and run it from anywhere just by typing `banner`.
 * **Smart Setup Menu:** Auto-detects if it's already installed and gives you a menu to easily change your name or update the script.
 * **Auto Shell Detection:** Automatically adds the startup command to your `.bashrc` or `.zshrc` depending on what you use.
 * **Custom User Greeting:** Asks for your name on the first run and saves it securely. 
@@ -21,30 +22,23 @@ chmod +x setup.sh
 ./setup.sh
 ```
 
-**Note:** The setup script will automatically download the banner script to a hidden file (`~/.banner.py`) and set it to run automatically every time you open a new Termux session.
+**Note:** The setup script will automatically install it as a system command and set it to run automatically every time you open a new Termux session.
 
 ## 🚀 Usage
 
 Whenever you open a new Termux session, the banner will load automatically.
 
+Because T-BAN installs as a global command, you can launch it manually from any directory by simply typing:
+```bash
+banner
+```
+
 ### How to Change Your Name?
-If you want to change the name on the banner or reinstall the script, just run the setup script again:
+If you want to change the name on the banner or fix a typo, you can run:
 ```bash
-./setup.sh
+banner --reset
 ```
-A menu will appear like this:
-1) Update/Change Name
-2) Reinstall or Update Script
-3) Exit
-
-Simply press `1` to set a new name!
-
-### Manual Command
-If you ever want to run the banner manually or reset the name without the setup script, you can run:
-```bash
-python ~/.banner.py
-python ~/.banner.py --reset
-```
+Alternatively, you can run `./setup.sh` again to access the interactive update menu.
 
 ## 📦 Requirements
 * `python` 3.x
