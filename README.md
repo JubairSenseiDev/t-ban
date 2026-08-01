@@ -28,7 +28,7 @@ curl -sL https://raw.githubusercontent.com/JubairSenseiDev/t-ban/main/setup.sh -
 
 ## 🎨 Pro Terminal Styling (Zsh + Powerlevel10k)
 
-[Srt](https://raw.githubusercontent.com/JubairSenseiDev/t-ban/refs/heads/main/Screenshot_2026_0801_142409.png)
+![](https://raw.githubusercontent.com/JubairSenseiDev/t-ban/refs/heads/main/Screenshot_2026_0801_142409.png)
 
 Want to make your Termux look extremely professional with **auto-suggestions (watermark commands)**, **syntax highlighting**, and the **Powerlevel10k** theme? 
 
