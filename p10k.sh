@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Termux-only guard: PREFIX must point at the Termux usr dir.
+case "$PREFIX" in
+    *com.termux*) ;;
+    *) echo -e "\e[1;31m[!] This script is for Termux only. Aborting.\e[0m"; exit 1 ;;
+esac
+
 clear
 echo -e "\e[1;36m───────────────────────────────────────────\e[0m"
 echo -e "\e[1;32m    TERMUX ZSH + POWERLEVEL10K SETUP       \e[0m"
@@ -9,41 +15,64 @@ echo ""
 # 1. Update and install prerequisites
 echo -e "\e[1;33m[*] Installing Zsh, Git, and required packages...\e[0m"
 pkg update -y && pkg install zsh git curl wget ncurses-utils -y
+if ! command -v zsh >/dev/null 2>&1 || ! command -v git >/dev/null 2>&1; then
+    echo -e "\e[1;31m[!] zsh/git not installed. Check internet, run 'pkg update', then retry.\e[0m"
+    exit 1
+fi
 
-# 2. Install Oh My Zsh (Unattended)
+# 2. Install Oh My Zsh (Unattended). RUNZSH/CHSH=no so the installer does not
+# spawn a subshell or change the shell mid-script.
 if [ ! -d "$HOME/.oh-my-zsh" ]; then
     echo -e "\e[1;33m[*] Installing Oh My Zsh...\e[0m"
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+    RUNZSH=no CHSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 else
     echo -e "\e[1;32m[*] Oh My Zsh is already installed.\e[0m"
+fi
+
+# Fallback: if the installer did not create ~/.zshrc, seed one from the template
+# (or a minimal file) so the sed/migration steps below have something to work on.
+if [ ! -f "$HOME/.zshrc" ]; then
+    echo -e "\e[1;33m[*] ~/.zshrc missing; creating from template...\e[0m"
+    if [ -f "$HOME/.oh-my-zsh/templates/zshrc.zsh-template" ]; then
+        cp "$HOME/.oh-my-zsh/templates/zshrc.zsh-template" "$HOME/.zshrc"
+    else
+        printf 'export ZSH="$HOME/.oh-my-zsh"\nZSH_THEME="robbyrussell"\nplugins=(git)\nsource $ZSH/oh-my-zsh.sh\n' > "$HOME/.zshrc"
+    fi
 fi
 
 # 3. Install Powerlevel10k
 ZSH_CUSTOM="$HOME/.oh-my-zsh/custom"
 if [ ! -d "$ZSH_CUSTOM/themes/powerlevel10k" ]; then
     echo -e "\e[1;33m[*] Downloading Powerlevel10k Theme...\e[0m"
-    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git $ZSH_CUSTOM/themes/powerlevel10k
+    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$ZSH_CUSTOM/themes/powerlevel10k" || echo -e "\e[1;31m[!] Powerlevel10k clone failed; theme may not load.\e[0m"
 fi
 
-# 4. Install Auto-suggestions (জলছাপ সাজেশন)
+# 4. Install Auto-suggestions
 if [ ! -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ]; then
     echo -e "\e[1;33m[*] Installing Auto-suggestions plugin...\e[0m"
-    git clone https://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions
+    git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions "$ZSH_CUSTOM/plugins/zsh-autosuggestions" || echo -e "\e[1;31m[!] Auto-suggestions clone failed.\e[0m"
 fi
 
-# 5. Install Syntax Highlighting (কমান্ড কালারিং)
+# 5. Install Syntax Highlighting
 if [ ! -d "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" ]; then
     echo -e "\e[1;33m[*] Installing Syntax Highlighting plugin...\e[0m"
-    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $ZSH_CUSTOM/plugins/zsh-syntax-highlighting
+    git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting.git "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" || echo -e "\e[1;31m[!] Syntax-highlighting clone failed.\e[0m"
 fi
+
+# Only enable plugins that actually cloned successfully, so a failed clone
+# does not make zsh error out on every startup.
+ENABLED_PLUGINS="git"
+[ -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ] && ENABLED_PLUGINS="$ENABLED_PLUGINS zsh-autosuggestions"
+[ -d "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" ] && ENABLED_PLUGINS="$ENABLED_PLUGINS zsh-syntax-highlighting"
 
 # 6. Configure .zshrc
 echo -e "\e[1;33m[*] Configuring settings...\e[0m"
-cp ~/.zshrc ~/.zshrc.backup 2>/dev/null
+# Back up the original .zshrc only once, so re-running never overwrites the
+# pristine backup with an already-modified file.
+[ -f ~/.zshrc.backup ] || cp ~/.zshrc ~/.zshrc.backup 2>/dev/null
 
-# Set theme and plugins
 sed -i 's/^ZSH_THEME=.*/ZSH_THEME="powerlevel10k\/powerlevel10k"/' ~/.zshrc
-sed -i 's/^plugins=(.*/plugins=(git zsh-autosuggestions zsh-syntax-highlighting)/' ~/.zshrc
+sed -i "s/^plugins=(.*/plugins=($ENABLED_PLUGINS)/" ~/.zshrc
 
 # 7. Migrate settings from .bashrc to .zshrc (অটোমেটিক কপি করার লজিক)
 echo -e "\e[1;33m[*] Migrating configurations from .bashrc to .zshrc...\e[0m"

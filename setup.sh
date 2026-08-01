@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Termux-only guard: PREFIX must point at the Termux usr dir.
+case "$PREFIX" in
+    *com.termux*) ;;
+    *) echo -e "\e[1;31m[!] This script is for Termux only. Aborting.\e[0m"; exit 1 ;;
+esac
+
 BANNER_FILE="$HOME/.banner.py"
 BIN_DIR="$PREFIX/bin"
 CMD_NAME="banner"
@@ -28,13 +34,20 @@ uninstall_banner() {
 
 install_banner() {
     echo -e "\e[1;33m[*] Installing required packages...\e[0m"
-    pkg install curl python figlet procps ncurses-utils -y
-    
+    if ! pkg install curl python figlet procps ncurses-utils -y; then
+        echo -e "\e[1;31m[!] Package installation failed. Check your internet and run 'pkg update' first.\e[0m"
+        exit 1
+    fi
+
     echo -e "\e[1;33m[*] Installing Python dependencies...\e[0m"
-    pip install rich requests
+    pip install rich requests || { echo -e "\e[1;31m[!] Failed to install Python packages (rich/requests).\e[0m"; exit 1; }
 
     echo -e "\e[1;33m[*] Downloading script...\e[0m"
-    curl -sL -o "$BANNER_FILE" "$REPO_URL"
+    if ! curl -fsSL -o "$BANNER_FILE" "$REPO_URL" || [ ! -s "$BANNER_FILE" ]; then
+        echo -e "\e[1;31m[!] Failed to download banner.py. Aborting so no broken command is created.\e[0m"
+        rm -f "$BANNER_FILE"
+        exit 1
+    fi
 
     # Creating a global command 'banner' in $PREFIX/bin with purely BASH logic
     echo -e "\e[1;33m[*] Creating global command '$CMD_NAME'...\e[0m"
@@ -72,7 +85,7 @@ EOF
     fi
 
     # Auto-start setup
-    if ! grep -q "$CMD_NAME" "$RC_FILE" 2>/dev/null; then
+    if ! grep -qxF "$CMD_NAME" "$RC_FILE" 2>/dev/null; then
         echo -e "\e[1;33m[*] Setting up auto-start in $RC_FILE...\e[0m"
         echo "" >> "$RC_FILE"
         echo "$CMD_NAME" >> "$RC_FILE"
