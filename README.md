@@ -63,6 +63,10 @@ banner --reset
 ```
 Alternatively, you can run the installation command again to access the interactive update menu.
 
+## FINAL LOOK 
+
+![](https://raw.githubusercontent.com/JubairSenseiDev/t-ban/refs/heads/main/Screenshot_2026_0801_142614.png)
+
 ### 🗑️ How to Uninstall
 
 ### 1. Uninstall T-BAN (The Banner)
