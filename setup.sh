@@ -1,6 +1,8 @@
 #!/bin/bash
 
 BANNER_FILE="$HOME/.banner.py"
+BIN_DIR="$PREFIX/bin"
+CMD_NAME="banner"
 REPO_URL="https://github.com/JubairSenseiDev/t-ban/raw/refs/heads/main/banner.py"
 
 clear
@@ -9,13 +11,11 @@ echo -e "\e[1;32m      SENSEI X BANNER - SETUP SCRIPT     \e[0m"
 echo -e "\e[1;36m──────────────────────────────────\e[0m"
 echo ""
 
-# নাম পরিবর্তন করার ফাংশন
 update_name() {
     echo -e "\e[1;33m[*] Opening name setup...\e[0m"
-    python "$BANNER_FILE" --reset
+    banner --reset
 }
 
-# ইনস্টল/আপডেট করার ফাংশন
 install_banner() {
     echo -e "\e[1;33m[*] Installing required packages...\e[0m"
     pkg install curl python figlet procps ncurses-utils -y
@@ -23,23 +23,27 @@ install_banner() {
     echo -e "\e[1;33m[*] Installing Python dependencies...\e[0m"
     pip install rich requests
 
-    echo -e "\e[1;33m[*] Downloading banner.py to hidden file...\e[0m"
+    echo -e "\e[1;33m[*] Downloading script...\e[0m"
     curl -sL -o "$BANNER_FILE" "$REPO_URL"
+
+    # Creating a global command 'banner' in $PREFIX/bin
+    echo -e "\e[1;33m[*] Creating global command '$CMD_NAME'...\e[0m"
+    echo "#!/bin/bash" > "$BIN_DIR/$CMD_NAME"
+    echo "python $BANNER_FILE \"\$@\"" >> "$BIN_DIR/$CMD_NAME"
+    chmod +x "$BIN_DIR/$CMD_NAME"
 
     # Shell Detection (Bash or Zsh)
     if [[ "$SHELL" == *"zsh"* ]]; then
         RC_FILE="$HOME/.zshrc"
-    elif [[ "$SHELL" == *"bash"* ]]; then
-        RC_FILE="$HOME/.bashrc"
     else
-        RC_FILE="$HOME/.bashrc" # fallback
+        RC_FILE="$HOME/.bashrc" # Default fallback for bash
     fi
 
-    # Duplicate এড়ানোর জন্য চেক করা হচ্ছে
-    if ! grep -q "python $BANNER_FILE" "$RC_FILE" 2>/dev/null; then
+    # Auto-start setup
+    if ! grep -q "$CMD_NAME" "$RC_FILE" 2>/dev/null; then
         echo -e "\e[1;33m[*] Setting up auto-start in $RC_FILE...\e[0m"
         echo "" >> "$RC_FILE"
-        echo "python $BANNER_FILE" >> "$RC_FILE"
+        echo "$CMD_NAME" >> "$RC_FILE"
     else
         echo -e "\e[1;32m[*] Auto-start is already configured in $RC_FILE.\e[0m"
     fi
@@ -49,12 +53,12 @@ install_banner() {
     echo -e "\e[1;33m[*] Now, let's set your name...\e[0m"
     sleep 2
     
-    # নাম সেট করার জন্য স্ক্রিপ্ট রান করা
-    python "$BANNER_FILE"
+    # Run the newly created command
+    banner
 }
 
-# চেক করা হচ্ছে আগে থেকে ইনস্টল করা আছে কিনা
-if [ -f "$BANNER_FILE" ]; then
+# Check if command 'banner' already exists
+if command -v $CMD_NAME &> /dev/null; then
     echo -e "\e[1;32m[!] T-BAN is already installed on your system.\e[0m"
     echo ""
     echo "Select an option:"
@@ -71,6 +75,6 @@ if [ -f "$BANNER_FILE" ]; then
         *) echo -e "\e[1;31mInvalid choice!\e[0m"; exit 1 ;;
     esac
 else
-    # প্রথমবার হলে সরাসরি ইনস্টল হবে
+    # First time installation
     install_banner
 fi
